@@ -1,0 +1,21 @@
+{
+  "name": "@jellycat-js/jellycat-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Louis-Antoine Lumet",
+  "repository": {
+    "url": "git://github.com/jellycat-js/jellycat-cli.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "node": ">=16.0.0",
+  "license": "MIT",
+  "bin": {
+    "make-jellycat": "bin/make-jellycat.js"
+  }
+}
