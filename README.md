@@ -2,5 +2,5 @@
 [![License](https://img.shields.io/npm/l/express.svg)](https://github.com/arminbro/generate-react-cli/blob/master/LICENSE)
 
 <p align="center"> 
-  <img src="https://raw.githubusercontent.com/jellycat-js/jellycat-cli/master/docs/assets/jellycat.svg?raw=true"/>
+  <img src="https://raw.githubusercontent.com/jellycat-js/jellycat-cli/master/docs/assets/jellycat.svg?raw=true" height="300" />
 </p>
