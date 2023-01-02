@@ -6,14 +6,6 @@ import { primary, secondary, pkg, columnDisplay } from './utils.js'
 
 export default class Command
 {
-	get readline()
-	{
-		return _ => readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		})
-	}
-
 	constructor({ description, usage, args, options, helpContent })
 	{
 		this.quiet = false
@@ -30,6 +22,11 @@ export default class Command
 		])
 
 		this.helpContent = helpContent
+
+		this.readline = readline.createInterface({
+			input: process.stdin,
+			output: process.stdout
+		})
 	}
 
 	parseProcessArgs(args)
@@ -57,6 +54,26 @@ export default class Command
         }
 
     	return { inputOptions, inputArguments }
+	}
+
+	async askInput(question)
+	{
+		return await new Promise(resolve => {
+			this.readline.question(question, resolve)
+		})	
+	}
+
+	async checkAndAskInput([args, index], rule, question)
+	{
+		let input = typeof args[index] === 'undefined' ? '' : args[index]
+
+		while(!rule.test(input))
+		{
+			input = await this.askInput(question)
+			if (input.length === 0) process.exit(1)
+		}
+
+		return input
 	}
 
 	isJellycat()

@@ -39,16 +39,14 @@ export default class MakeComponent extends Command
         const { inputOptions, inputArguments } = this.parseProcessArgs(args)
 
         if (inputOptions.includes('-n') || inputOptions.includes('--no-interaction')) {
-            if (inputArguments.length === 0) inputArguments[0] = 'App'
+            if (typeof inputArguments[0] === 'undefined') inputArguments[0] = 'App'
         }
 
-		const name = inputArguments.length > 0
-			? inputArguments[0]
-			: await new Promise(resolve => {
-				this.getReadline.question(`\n${primary('Choose a name for your component class (e.g. ')}${secondary('App')}${primary('):')}\n>`, resolve)
-			})
-
-		if (name.length === 0) process.exit(1)
+    	const name = await this.checkAndAskInput(
+    		[inputArguments, 0], 
+    		/^([A-Z]{1}[a-z]*){1,2}$/,
+    		`\n${primary('Choose a name for your component class (e.g. ')}${secondary('App')}${primary('):')}\n> `
+    	)
 
     	const ancestor = this.defineAncestor(inputOptions.find(option => /^--tagname=|-t=/.test(option)))
     	const tag = this.defineTagByPrefix(name, inputOptions.find(option => /^--prefix=|-p=/.test(option)))
