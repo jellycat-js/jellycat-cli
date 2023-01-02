@@ -1,48 +1,50 @@
 'use strict'
 
-import { pkg } from '../utils/env.js'
-import { primary, secondary } from '../utils/style.js'
-import { parseProcessArgs, columnDisplay, help } from '../utils/command.js'
+import Command from '../core/command.js'
+import { primary, secondary, columnDisplay, pkg } from '../core/utils.js'
 
-export const description = 'Display information about the Jellycat CLI and environement'
+export const definition = {
+    description: 'Display information about the Jellycat CLI and environement',  
+    usage: 'about', 
+    args: [],
+    options: [],
+    helpContent: [
+        `  The ${primary('about')} command displays information about the current Jellycat project.`,
+        `  The ${primary('nodejs')} section displays important configuration that could affect your application. The values might be different between web and CLI.`
+    ]
+}
 
-export default async args => {
+export default class About extends Command
+{
+    constructor() { super(definition) }
+    
+    async execute(args)
+    {
+        const { inputOptions } = Command.parseProcessArgs(args)
 
-    const { options } = parseProcessArgs(args)
+        if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
+            this.help()
+            process.exit()
+        }
 
-    if (options.includes('-h') || options.includes('--help')) {
+        process.stdout.write(`${columnDisplay([
+            ['--------------------', '-------------------------------------------'],
+            [` ${primary('Jellycat CLI')}`, ''],
+            ['--------------------', '-------------------------------------------'],
+            [' Version', ` ${pkg('version')}`],
+            [' Long-Term Support', ` No`],
+            [' End of maintenance', ` 01/2023 (${secondary('in +30 days')})`],
+            [' End of life', ` 01/2023 (${secondary('in +30 days')})`],
+            ['--------------------', '-------------------------------------------'],
+            [` ${primary('Nodejs')}`, ''],
+            ['--------------------', '-------------------------------------------'],
+            [' Version', ` ${process.versions.node}`],
+            [' Architecture', ` ${process.arch}`],
+            [' Intl locale', ` ${process.env.LANG}`],
+            [' Timezone', ` ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${secondary((new Date()).toISOString())})`],
+            ['--------------------', '-------------------------------------------']
+        ])}`)
 
-        help({
-            description: description, 
-            usage: 'about', 
-            args: [],
-            options: [],
-            content: [
-                `  The ${primary('about')} command displays information about the current Jellycat project.`,
-                `  The ${primary('nodejs')} section displays important configuration that could affect your application. The values might be different between web and CLI.`
-            ]
-        })
-        
         process.exit()
     }
-
-    process.stdout.write(`${columnDisplay([
-        ['--------------------', '-------------------------------------------'],
-        [` ${primary('Jellycat CLI')}`, ''],
-        ['--------------------', '-------------------------------------------'],
-        [' Version', ` ${pkg('version')}`],
-        [' Long-Term Support', ` No`],
-        [' End of maintenance', ` 01/2023 (${secondary('in +30 days')})`],
-        [' End of life', ` 01/2023 (${secondary('in +30 days')})`],
-        ['--------------------', '-------------------------------------------'],
-        [` ${primary('Nodejs')}`, ''],
-        ['--------------------', '-------------------------------------------'],
-        [' Version', ` ${process.versions.node}`],
-        [' Architecture', ` ${process.arch}`],
-        [' Intl locale', ` ${process.env.LANG}`],
-        [' Timezone', ` ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${secondary((new Date()).toISOString())})`],
-        ['--------------------', '-------------------------------------------']
-    ])}`)
-
-    process.exit()
 }

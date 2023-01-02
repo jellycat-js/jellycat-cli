@@ -1,15 +1,15 @@
 'use strict'
 
 import fs from 'fs'
-import { error } from './utils/style.js'
-import { cmdPath } from './utils/command.js'
+import { error, cmdPath } from './core/utils.js'
 
 export default async args => {
 
 	try
 	{
 		const commandPath = cmdPath(args.length < 3 || !(fs.existsSync(cmdPath(args[2]))) ? 'list' : args[2])
-		await (await import(commandPath)).default(args.slice(3))
+		const command = await (await import(commandPath)).default
+		await (new command()).execute(args.slice(3))
 		process.exit(0)
 	} 
 

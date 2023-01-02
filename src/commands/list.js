@@ -1,86 +1,88 @@
 'use strict'
 
 import fs from 'fs'
-import { pkg, dirname } from '../utils/env.js'
-import { primary, secondary } from '../utils/style.js'
-import { genericOptions, parseProcessArgs, columnDisplay, help, cmdPath } from '../utils/command.js'
+import Command from '../core/command.js'
+import { primary, secondary, pkg, columnDisplay, cmdPath, dirname, resolveCommands } from '../core/utils.js'
 
-export const description = 'List commands'
+export const definition = {
+    description: 'List commands', 
+    usage: 'list [options] [--] [<namespace>]', 
+    args: [
+        [primary('namespace'), 'The namespace name']
+    ], 
+    options: [
+        [primary('-V, --version'), `Display this application version`]
+    ],
+    helpContent: [
+        `  The ${primary('list')} command lists all commands:`,
+        `    ${primary('npx jellycat list')}`,
+        `  You can also display the commands for a specific namespace:`,
+        `    ${primary('npx jellycat list test')}`
+    ]
+}
 
-export default async args => {
+export default class List extends Command
+{
+    constructor() { super(definition) }
 
-    const { options, arguments: cmdArgs } = parseProcessArgs(args)
+    async execute(args)
+    {
+        const { inputOptions, inputArguments } = Command.parseProcessArgs(args)
 
-    if (options.includes('-h') || options.includes('--help')) {
+        if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
+            this.help()
+            process.exit()
+        }
 
-        help({
-            description: description, 
-            usage: 'list [options] [--] [<namespace>]', 
-            args: [
-                [primary('namespace'), 'The namespace name']
-            ], 
-            options: [
-                [primary('-V, --version'), `Display this application version`]
-            ],
-            content: [
-                `  The ${primary('list')} command lists all commands:`,
-                `    ${primary('npx jellycat list')}`,
-                `  You can also display the commands for a specific namespace:`,
-                `    ${primary('npx jellycat list test')}`
-            ]
-        })
+        const output = [
+            `Jellycat CLI ${primary(pkg('version'))}\n`,
+            `${secondary('Usage:')}\n  command [options] [arguments]\n`,
+            secondary('Options:'),
+            columnDisplay(this.options, 2),
+            secondary('Available commands:')
+        ]
 
-        process.exit()
-    }
+        output.forEach(line => process.stdout.write(`${line}\n`))
 
-    process.stdout.write(`Jellycat CLI ${primary(pkg('version'))}\n\n`)
-    process.stdout.write(`${secondary('Usage:')}\n  command [options] [arguments]\n\n`)
-    process.stdout.write(`${secondary('Options:')}\n`)
-    process.stdout.write(`${genericOptions}\n`)
-    process.stdout.write(`${secondary('Available commands:')}\n`)
+        const commands = resolveCommands(import.meta.url)
+        const namespace = inputArguments.length > 0 ? inputArguments[0] : false
 
-    const commands = { root: [] }
+        if (!namespace || !Object.keys(commands).includes(namespace)) {
 
-    fs.readdirSync(dirname(import.meta.url)).forEach(ls => {
-        !fs.lstatSync(`${dirname(import.meta.url)}/${ls}`).isDirectory()
-            ? commands.root.push(ls.split('.')[0])
-            : fs.readdirSync(`${dirname(import.meta.url)}/${ls}`).forEach(file => {
-                if (!Object.keys(commands).includes(ls)) commands[ls] = []
-                commands[ls].push(file.split('.')[0])
-            })
-    })
+            const rootCommands = await Promise.all(commands.root.map(async command => {
+                return [primary(command), command !== 'list'
+                    ? (await import(cmdPath(command))).definition.description
+                    : definition.description
+                ]
+            }))
 
-    const namespace = cmdArgs.length > 0 ? cmdArgs[0] : false
+            process.stdout.write(`${columnDisplay(rootCommands, 2)}`)
 
-    if (!namespace || !Object.keys(commands).includes(namespace)) {
+            for (const nsTitle of Object.keys(commands).filter(ns => ns != 'root'))
+            {
+                process.stdout.write(` ${secondary(nsTitle)}\n`)
+                const namespaceCommands = await Promise.all(commands[nsTitle].map(async command => {
+                    return [ 
+                        primary(`${nsTitle}:${command}`), 
+                        (await import(cmdPath(`${nsTitle}/${command}`))).definition.description
+                    ]
+                }))
 
-        const rootCommands = await Promise.all(commands.root.map(async command => {
-            return [primary(command), command !== 'list'
-                ? (await import(cmdPath(command))).description
-                : description
-            ]
-        }))
+                process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
+            }
+        
+        } else {
 
-        process.stdout.write(`${columnDisplay(rootCommands, 2)}`)
-
-        for (const nsTitle of Object.keys(commands).filter(ns => ns != 'root'))
-        {
-            process.stdout.write(` ${secondary(nsTitle)}\n`)
-            const namespaceCommands = await Promise.all(commands[nsTitle].map(async command => {
-                return [ primary(`${nsTitle}:${command}`), (await import(cmdPath(`${nsTitle}/${command}`))).description ]
+            const namespaceCommands = await Promise.all(commands[namespace].map(async command => {
+                return [ 
+                    primary(`${namespace}:${command}`), 
+                    (await import(cmdPath(`${namespace}/${command}`))).definition.description
+                ]
             }))
 
             process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
         }
-    
-    } else {
 
-        const namespaceCommands = await Promise.all(commands[namespace].map(async command => {
-            return [ primary(`${namespace}:${command}`), (await import(cmdPath(`${namespace}/${command}`))).description ]
-        }))
-
-        process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
+        process.exit()
     }
-
-    process.exit()
 }

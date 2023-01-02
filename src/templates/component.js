@@ -1,10 +1,10 @@
 'use strict'
 
-const js = `'use strict'
+const js = data => `'use strict'
 
-import { COMPONENT_ANCESTOR } from '@jellycat-js/jellycat'
+import { ${data.ancestor} } from '@jellycat-js/jellycat'
 
-export default class COMPONENT_NAME extends COMPONENT_ANCESTOR
+export default class ${data.name} extends ${data.ancestor}
 {
 	constructor()
 	{ 
@@ -27,11 +27,11 @@ export default class COMPONENT_NAME extends COMPONENT_ANCESTOR
 	}
 }`
 
-const css = `COMPONENT_TAG {
+const css = data => `${data.tag} {
 	display: block;
 }`
 
-const html = `<template id="root">
+const html = data => `<template id="root">
 	<div>Hello!</div>
 </template>`
 

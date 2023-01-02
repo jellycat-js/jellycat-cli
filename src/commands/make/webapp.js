@@ -1,19 +1,32 @@
 'use strict'
 
-import readline from 'readline'
-import { secondary, primary } from '../../utils/style.js'
+import Command from '../../core/command.js'
+import { primary, secondary } from '../../core/utils.js'
 
-export const description = 'Creates a base webapp'
+export const definition = {
+    description: 'Creates a base webapp',  
+    usage: 'make:webapp [options] [--] [<project>]',
+    args: [],
+	options: [
+		[primary('-n, --no-interaction'), `Do not ask any interactive question`]
+   	],
+    helpContent: []
+}
 
-export default async args => {
+export default class MakeWebapp extends Command
+{
+    constructor() { super(definition) }
 
-	const rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout
-	})
+    async execute(args)
+    {
+    	const { inputOptions } = Command.parseProcessArgs(args)
 
-	// TODO
-
-	process.stdout.write('Not implemented yet\n')
-	process.exit()
+	    if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
+	        this.help()
+	        process.exit()
+	    }
+	    
+        process.stdout.write('Not implemented yet\n')
+		process.exit()
+    }
 }

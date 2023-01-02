@@ -1,8 +1,8 @@
 'use strict'
 
-export default `'use strict'
+export default data => `'use strict'
 
-export default function MIXIN_NAME(superclass)
+export default function ${data.name}(superclass)
 {
 	return class extends superclass
 	{
