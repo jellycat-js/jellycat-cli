@@ -9,20 +9,6 @@ import * as template from '../../templates/component.js'
 
 export const description = 'Creates a new component class'
 
-const buildTemplate = (ext, code, data) => {
-	switch(ext)
-	{
-		case 'js': return code
-			.replaceAll('COMPONENT_ANCESTOR', data.ancestor)
-			.replaceAll('COMPONENT_NAME', data.name)
-
-		case 'css': return code
-			.replaceAll('COMPONENT_TAG', data.tag)
-
-		case 'html': return code
-	}
-}
-
 export default async args => {
 
 	const { options } = parseProcessArgs(args)
@@ -35,17 +21,23 @@ export default async args => {
             args: [
             	[primary('component-class'), `Choose a name for your component class (e.g. ${secondary('App')})`]
            	], 
-           	options: [],
+           	options: [
+           		[primary('-t, --tag=TAG'), `The html tag from which the component extends (div, span, ul, li, p, label, input or textarea)`],
+           		[primary('-p, --prefix=PREFIX'), `The prefix used for custom html tagname of component ${secondary('[default: "jc"]')}`],
+           		[primary('    --only=EXTENSION'), `Generate only one template file (js, css or html)`],
+           		[primary('    --with-mixin'), `Generate component with mixin syntax ready`],
+           		[primary('-n, --no-interaction'), `Do not ask any interactive question`]
+           	],
             content: [
             	`  The ${primary('make:component')} command generates a new component class.`,
 				`  ${primary('npx jellycat make:component App')}`,
 				`  If the argument is missing, the command will ask for the component class name interactively.`,
 				`  You can also generate the component js, css or html alone with one of this options:`,
-				`  ${primary('npx jellycat make:component --only-js --only-css --only-html')}`
+				`  ${primary('npx jellycat make:component --only=js')}`
             ]
         })
         
-        process.exit(1)
+        process.exit()
     }
 
 	const rl = readline.createInterface({
@@ -59,44 +51,29 @@ export default async args => {
 			rl.question(`\n${primary('Choose a name for your component class (e.g. ')}${secondary('App')}${primary('):')}\n>`, resolve)
 		})
 
-	if (name.length === 0) process.exit(0)
+	if (name.length === 0) process.exit(1)
 
 	for (const [ext, code] of Object.entries(template))
 	{
-		if (Object.keys(pkg('dependencies')).includes('@jellycat-js/jellycat')) {
+		const buildedTemplate = code
+			.replaceAll('COMPONENT_ANCESTOR', 'JcComponent') // tag option
+			.replaceAll('COMPONENT_NAME', name) // to camel max 2 word
+			.replaceAll('COMPONENT_TAG', name) // to snakecase
 
-			if (!fs.existsSync(`${process.env.PWD}/components`)) {
-				fs.mkdirSync(`${process.env.PWD}/components`)
-			}
+		const webAppArchitectury = Object.keys(pkg('dependencies')).includes('@jellycat-js/jellycat')
 
-			if (!fs.existsSync(`${process.env.PWD}/components/${name}`)) {
-				fs.mkdirSync(`${process.env.PWD}/components/${name}`)
-			}
+		if (webAppArchitectury && !fs.existsSync(`${process.env.PWD}/components`)) {
+			fs.mkdirSync(`${process.env.PWD}/components`)
+		}
 
-			if (!fs.existsSync(`${process.env.PWD}/components/${name}/${name}.${ext}`)) {
-				fs.writeFileSync(`${process.env.PWD}/components/${name}/${name}.${ext}`, buildTemplate(ext, code, {
-					ancestor: 'JcComponent',
-					name: name, // to camel max 2 word
-					tag: name // to snakecase
-				}), { flag: 'wx' })
-			}
+		if (!fs.existsSync(`${process.env.PWD}/${webAppArchitectury ? `components/${name}`: name}`)) {
+			fs.mkdirSync(`${process.env.PWD}/${webAppArchitectury ? `components/${name}`: name}`)
+		}
 
-		} else {
-
-			if (!fs.existsSync(`${process.env.PWD}/${name}`)) {
-				fs.mkdirSync(`${process.env.PWD}/${name}`)
-			}
-
-			if (!fs.existsSync(`${process.env.PWD}/${name}/${name}.${ext}`)) {
-				fs.writeFileSync(`${process.env.PWD}/${name}/${name}.${ext}`, buildTemplate(ext, code, {
-					ancestor: 'JcComponent',
-					name: name, // to camel max 2 word
-					tag: name // to snakecase
-				}), { flag: 'wx' })
-			}
-
+		if (!fs.existsSync(`${process.env.PWD}/${webAppArchitectury ? `components/${name}`: name}/${name}.${ext}`)) {
+			fs.writeFileSync(`${process.env.PWD}/${webAppArchitectury ? `components/${name}`: name}/${name}.${ext}`, buildedTemplate, { flag: 'wx' })
 		}
 	}
 
-	process.exit(0)
+	process.exit()
 }

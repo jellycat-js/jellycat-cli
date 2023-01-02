@@ -21,7 +21,9 @@ export default async args => {
             args: [
             	[primary('mixin-class'), `Choose a name for your mixin class (e.g. ${secondary('CoolStuff')})`]
            	], 
-           	options: [],
+           	options: [
+    			[primary('-n, --no-interaction'), `Do not ask any interactive question`]
+           	],
             content: [
             	`  The ${primary('make:mixin')} command generates a new mixin class.`,
 				`  ${primary('npx jellycat make:mixin CoolStuff')}`,
@@ -29,7 +31,7 @@ export default async args => {
             ]
         })
         
-        process.exit(1)
+        process.exit()
     }
 
 	const rl = readline.createInterface({
@@ -43,26 +45,18 @@ export default async args => {
 			rl.question(`\n${primary('Choose a name for your mixin class (e.g. ')}${secondary('CoolStuff')}${primary('):')}\n>`, resolve)
 		})
 
-	if (name.length === 0) process.exit(0)
+	if (name.length === 0) process.exit(1)
 
 	const buildedTemplate = template.replace('MIXIN_NAME', name) // to camel
+	const webAppArchitectury = Object.keys(pkg('dependencies')).includes('@jellycat-js/jellycat')
 
-	if (Object.keys(pkg('dependencies')).includes('@jellycat-js/jellycat')) {
-
-		if (!fs.existsSync(`${process.env.PWD}/mixins`)) {
-			fs.mkdirSync(`${process.env.PWD}/mixins`)
-		}
-
-		if (!fs.existsSync(`${process.env.PWD}/mixins/${name}.js`)) {
-			fs.writeFileSync(`${process.env.PWD}/mixins/${name}.js`, buildedTemplate, { flag: 'wx' })
-		}
-
-		process.exit(0)
+	if (webAppArchitectury && !fs.existsSync(`${process.env.PWD}/mixins`)) {
+		fs.mkdirSync(`${process.env.PWD}/mixins`)
 	}
 
-	if (!fs.existsSync(`${process.env.PWD}/${name}.js`)) {
-		fs.writeFileSync(`${process.env.PWD}/${name}.js`, buildedTemplate, { flag: 'wx' })
+	if (!fs.existsSync(`${process.env.PWD}/${webAppArchitectury ? `mixins/${name}`: name}.js`)) {
+		fs.writeFileSync(`${process.env.PWD}/${webAppArchitectury ? `mixins/${name}`: name}.js`, buildedTemplate, { flag: 'wx' })
 	}
 
-	process.exit(0)
+	process.exit()
 }

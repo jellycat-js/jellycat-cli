@@ -29,11 +29,9 @@ const columnDisplay = (items, indent = 0) => {
     }).join('\n') + '\n'
 }
 
-const genericOptions = `${secondary('Options:')}\n${columnDisplay([
+const genericOptions = `${columnDisplay([
     [primary('-h, --help'), `Display help for the given command. When no command is given display help for the ${primary('list')} command`],
     [primary('-q, --quiet'), `Do not output any message`],
-    [primary('-V, --version'), `Display this application version`],
-    [primary('-n, --no-interaction'), `Do not ask any interactive question`],
     [primary('-v|vv|vvv, --verbose'), `Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug`]
 ], 2)}`
 
@@ -47,11 +45,11 @@ const help = ({ description, usage, args = [], options = [], content = [] }) => 
         process.stdout.write(`${columnDisplay(args, 2)}\n`)
     }
 
-    // if (Array.isArray(options) && options.length > 0) {
-    //     process.stdout.write(`${secondary('Arguments:')}\n`)
-    //     process.stdout.write(`${columnDisplay(args, 2)}\n`)
-        process.stdout.write(`${genericOptions}\n`)
-    // }
+    process.stdout.write(`${secondary('Options:')}\n`)
+
+    if (Array.isArray(options) && options.length > 0) {
+        process.stdout.write(`${columnDisplay(options, 2)}`)
+    }
 
     process.stdout.write(`${genericOptions}\n`)
 

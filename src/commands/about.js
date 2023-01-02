@@ -6,24 +6,6 @@ import { parseProcessArgs, columnDisplay, help } from '../utils/command.js'
 
 export const description = 'Display information about the Jellycat CLI and environement'
 
-const output = _ => process.stdout.write(`${columnDisplay([
-    ['--------------------', '-------------------------------------------'],
-    [` ${primary('Jellycat CLI')}`, ''],
-    ['--------------------', '-------------------------------------------'],
-    [' Version', ` ${pkg('version')}`],
-    [' Long-Term Support', ` No`],
-    [' End of maintenance', ` 01/2023 (${secondary('in +30 days')})`],
-    [' End of life', ` 01/2023 (${secondary('in +30 days')})`],
-    ['--------------------', '-------------------------------------------'],
-    [` ${primary('Nodejs')}`, ''],
-    ['--------------------', '-------------------------------------------'],
-    [' Version', ` ${process.versions.node}`],
-    [' Architecture', ` ${process.arch}`],
-    [' Intl locale', ` ${process.env.LANG}`],
-    [' Timezone', ` ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${secondary((new Date()).toISOString())})`],
-    ['--------------------', '-------------------------------------------']
-])}`)
-
 export default async args => {
 
     const { options } = parseProcessArgs(args)
@@ -41,9 +23,26 @@ export default async args => {
             ]
         })
         
-        process.exit(1)
+        process.exit()
     }
 
-    output()
-    process.exit(1)
+    process.stdout.write(`${columnDisplay([
+        ['--------------------', '-------------------------------------------'],
+        [` ${primary('Jellycat CLI')}`, ''],
+        ['--------------------', '-------------------------------------------'],
+        [' Version', ` ${pkg('version')}`],
+        [' Long-Term Support', ` No`],
+        [' End of maintenance', ` 01/2023 (${secondary('in +30 days')})`],
+        [' End of life', ` 01/2023 (${secondary('in +30 days')})`],
+        ['--------------------', '-------------------------------------------'],
+        [` ${primary('Nodejs')}`, ''],
+        ['--------------------', '-------------------------------------------'],
+        [' Version', ` ${process.versions.node}`],
+        [' Architecture', ` ${process.arch}`],
+        [' Intl locale', ` ${process.env.LANG}`],
+        [' Timezone', ` ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${secondary((new Date()).toISOString())})`],
+        ['--------------------', '-------------------------------------------']
+    ])}`)
+
+    process.exit()
 }

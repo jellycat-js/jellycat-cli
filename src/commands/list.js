@@ -7,10 +7,35 @@ import { genericOptions, parseProcessArgs, columnDisplay, help, cmdPath } from '
 
 export const description = 'List commands'
 
-const output = async (namespace = false) => {
+export default async args => {
+
+    const { options, arguments: cmdArgs } = parseProcessArgs(args)
+
+    if (options.includes('-h') || options.includes('--help')) {
+
+        help({
+            description: description, 
+            usage: 'list [options] [--] [<namespace>]', 
+            args: [
+                [primary('namespace'), 'The namespace name']
+            ], 
+            options: [
+                [primary('-V, --version'), `Display this application version`]
+            ],
+            content: [
+                `  The ${primary('list')} command lists all commands:`,
+                `    ${primary('npx jellycat list')}`,
+                `  You can also display the commands for a specific namespace:`,
+                `    ${primary('npx jellycat list test')}`
+            ]
+        })
+
+        process.exit()
+    }
 
     process.stdout.write(`Jellycat CLI ${primary(pkg('version'))}\n\n`)
     process.stdout.write(`${secondary('Usage:')}\n  command [options] [arguments]\n\n`)
+    process.stdout.write(`${secondary('Options:')}\n`)
     process.stdout.write(`${genericOptions}\n`)
     process.stdout.write(`${secondary('Available commands:')}\n`)
 
@@ -24,6 +49,8 @@ const output = async (namespace = false) => {
                 commands[ls].push(file.split('.')[0])
             })
     })
+
+    const namespace = cmdArgs.length > 0 ? cmdArgs[0] : false
 
     if (!namespace || !Object.keys(commands).includes(namespace)) {
 
@@ -55,32 +82,5 @@ const output = async (namespace = false) => {
         process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
     }
 
-}
-
-export default async args => {
-
-    const { options, arguments: cmdArgs } = parseProcessArgs(args)
-
-    if (options.includes('-h') || options.includes('--help')) {
-
-        help({
-            description: description, 
-            usage: 'list [options] [--] [<namespace>]', 
-            args: [
-                [primary('namespace'), 'The namespace name']
-            ], 
-            options: [],
-            content: [
-                `  The ${primary('list')} command lists all commands:`,
-                `    ${primary('npx jellycat list')}`,
-                `  You can also display the commands for a specific namespace:`,
-                `    ${primary('npx jellycat list test')}`
-            ]
-        })
-
-        process.exit(1)
-    }
-
-    await output(cmdArgs.length > 0 ? cmdArgs[0] : false)
-    process.exit(1)
+    process.exit()
 }

@@ -15,5 +15,5 @@ export default async args => {
 	// TODO
 
 	process.stdout.write('Not implemented yet\n')
-	process.exit(0)
+	process.exit()
 }

@@ -13,7 +13,7 @@ export default async args => {
 
     if (cmdArgs.length > 0) {
         await cli([process.execPath, filename(import.meta.url), cmdArgs[0], '--help'])
-        process.exit(1)
+        process.exit()
     }
 
     help({
@@ -30,5 +30,5 @@ export default async args => {
         ]
     })
 
-    process.exit(1)
+    process.exit()
 }

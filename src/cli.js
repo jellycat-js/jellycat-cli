@@ -10,7 +10,7 @@ export default async args => {
 	{
 		const commandPath = cmdPath(args.length < 3 || !(fs.existsSync(cmdPath(args[2]))) ? 'list' : args[2])
 		await (await import(commandPath)).default(args.slice(3))
-		process.exit(1)
+		process.exit(0)
 	} 
 
 	catch(e)
