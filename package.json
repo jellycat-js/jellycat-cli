@@ -9,7 +9,7 @@
   "main": "bin/make-jellycat",
   "type": "module",
   "bin": {
-    "make-jellycat": "bin/make-jellycat.js"
+    "jellycat": "bin/jellycat.js"
   },
   "scripts": {
     "test": "jest"
