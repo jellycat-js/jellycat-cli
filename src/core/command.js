@@ -16,6 +16,9 @@ export default class Command
 
 	constructor({ description, usage, args, options, helpContent })
 	{
+		this.quiet = false
+		this.verbose = 0
+
 		this.description = description
 		this.usage = usage
 		this.args = args
@@ -29,16 +32,41 @@ export default class Command
 		this.helpContent = helpContent
 	}
 
-	static parseProcessArgs(args)
+	parseProcessArgs(args)
 	{
     	const inputOptions = args.filter(arg => arg.startsWith('-'))
     	const inputArguments = args.filter(arg => !inputOptions.includes(arg))
+
+    	if (inputOptions.includes('-q') || inputOptions.includes('--quiet')) {
+            this.quiet = true
+        }
+
+        if (inputOptions.includes('-vvv')) {
+        	this.verbose = 3
+
+        } else if (inputOptions.includes('-vv')) {
+        	this.verbose = 2
+
+        } else if (inputOptions.includes('-v') || inputOptions.includes('--verbose')) {
+            this.verbose = 1
+        }
+
+        if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
+            this.help()
+            process.exit()
+        }
+
     	return { inputOptions, inputArguments }
 	}
 
 	isJellycat()
 	{
 		return Object.keys(pkg('dependencies')).includes('@jellycat-js/jellycat')
+	}
+
+	version()
+	{
+		return `Jellycat CLI ${primary(pkg('version'))}`
 	}
 
 	help()
@@ -60,6 +88,11 @@ export default class Command
 			output = output.concat([secondary('Help:'), this.helpContent.join('\n\n')])
 	    }
 
-	    output.forEach(line => process.stdout.write(`${line}\n`))
+	    output.forEach(line => this.writeLn(`${line}\n`))
+	}
+
+	writeLn($line)
+	{
+		if (!this.quiet) process.stdout.write($line)
 	}
 }

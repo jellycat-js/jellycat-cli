@@ -19,14 +19,13 @@ export default class MakeWebapp extends Command
 
     async execute(args)
     {
-    	const { inputOptions } = Command.parseProcessArgs(args)
+    	const { inputOptions } = this.parseProcessArgs(args)
 
-	    if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
-	        this.help()
-	        process.exit()
-	    }
-	    
-        process.stdout.write('Not implemented yet\n')
+        if (inputOptions.includes('-n') || inputOptions.includes('--no-interaction')) {
+            
+        }
+
+        this.writeLn('Not implemented yet\n')
 		process.exit()
     }
 }

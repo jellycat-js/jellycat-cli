@@ -2,9 +2,9 @@
 
 const js = data => `'use strict'
 
-import { ${data.ancestor} } from '@jellycat-js/jellycat'
+import { ${data.mixinReady ? `JcMixin, ${data.ancestor}` : data.ancestor} } from '@jellycat-js/jellycat'
 
-export default class ${data.name} extends ${data.ancestor}
+export default class ${data.name} extends ${data.mixinReady ? `JcMixin(${data.ancestor}).with()` : data.ancestor}
 {
 	constructor()
 	{ 

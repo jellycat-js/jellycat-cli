@@ -27,15 +27,14 @@ export default class MakeMixin extends Command
 
     async execute(args)
     {
-        const { inputOptions } = Command.parseProcessArgs(args)
+        const { inputOptions, inputArguments } = this.parseProcessArgs(args)
 
-	    if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
-	        this.help()
-	        process.exit()
-	    }
+        if (inputOptions.includes('-n') || inputOptions.includes('--no-interaction')) {
+            if (inputArguments.length === 0) inputArguments[0] = 'CoolStuff'
+        }
 
-		const name = args.length > 0
-			? args[0]
+		const name = inputArguments.length > 0
+			? inputArguments[0]
 			: await new Promise(resolve => {
 				this.getReadline.question(`\n${primary('Choose a name for your mixin class (e.g. ')}${secondary('CoolStuff')}${primary('):')}\n>`, resolve)
 			})

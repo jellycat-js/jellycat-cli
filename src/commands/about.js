@@ -20,14 +20,9 @@ export default class About extends Command
     
     async execute(args)
     {
-        const { inputOptions } = Command.parseProcessArgs(args)
+        this.parseProcessArgs(args)
 
-        if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
-            this.help()
-            process.exit()
-        }
-
-        process.stdout.write(`${columnDisplay([
+        this.writeLn(`${columnDisplay([
             ['--------------------', '-------------------------------------------'],
             [` ${primary('Jellycat CLI')}`, ''],
             ['--------------------', '-------------------------------------------'],

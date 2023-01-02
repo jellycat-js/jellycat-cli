@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import Command from '../core/command.js'
-import { primary, secondary, pkg, columnDisplay, cmdPath, dirname, resolveCommands } from '../core/utils.js'
+import { primary, secondary, columnDisplay, cmdPath, dirname } from '../core/utils.js'
 
 export const definition = {
     description: 'List commands', 
@@ -27,24 +27,24 @@ export default class List extends Command
 
     async execute(args)
     {
-        const { inputOptions, inputArguments } = Command.parseProcessArgs(args)
+        const { inputOptions, inputArguments } = this.parseProcessArgs(args)
 
-        if (inputOptions.includes('-h') || inputOptions.includes('--help')) {
+        if (inputOptions.includes('-V') || inputOptions.includes('--version')) {
             this.help()
             process.exit()
         }
 
         const output = [
-            `Jellycat CLI ${primary(pkg('version'))}\n`,
+            `${this.version()}\n`,
             `${secondary('Usage:')}\n  command [options] [arguments]\n`,
             secondary('Options:'),
             columnDisplay(this.options, 2),
             secondary('Available commands:')
         ]
 
-        output.forEach(line => process.stdout.write(`${line}\n`))
+        output.forEach(line => this.writeLn(`${line}\n`))
 
-        const commands = resolveCommands(import.meta.url)
+        const commands = this.resolveCommands(import.meta.url)
         const namespace = inputArguments.length > 0 ? inputArguments[0] : false
 
         if (!namespace || !Object.keys(commands).includes(namespace)) {
@@ -56,11 +56,11 @@ export default class List extends Command
                 ]
             }))
 
-            process.stdout.write(`${columnDisplay(rootCommands, 2)}`)
+            this.writeLn(`${columnDisplay(rootCommands, 2)}`)
 
             for (const nsTitle of Object.keys(commands).filter(ns => ns != 'root'))
             {
-                process.stdout.write(` ${secondary(nsTitle)}\n`)
+                this.writeLn(` ${secondary(nsTitle)}\n`)
                 const namespaceCommands = await Promise.all(commands[nsTitle].map(async command => {
                     return [ 
                         primary(`${nsTitle}:${command}`), 
@@ -68,7 +68,7 @@ export default class List extends Command
                     ]
                 }))
 
-                process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
+                this.writeLn(`${columnDisplay(namespaceCommands, 2)}`)
             }
         
         } else {
@@ -80,9 +80,25 @@ export default class List extends Command
                 ]
             }))
 
-            process.stdout.write(`${columnDisplay(namespaceCommands, 2)}`)
+            this.writeLn(`${columnDisplay(namespaceCommands, 2)}`)
         }
 
         process.exit()
+    }
+
+    resolveCommands(path)
+    {
+        const commands = { root: [] }
+
+        fs.readdirSync(dirname(path)).forEach(ls => {
+            !fs.lstatSync(`${dirname(path)}/${ls}`).isDirectory()
+                ? commands.root.push(ls.split('.')[0])
+                : fs.readdirSync(`${dirname(path)}/${ls}`).forEach(file => {
+                    if (!Object.keys(commands).includes(ls)) commands[ls] = []
+                    commands[ls].push(file.split('.')[0])
+                })
+        })
+
+        return commands
     }
 }

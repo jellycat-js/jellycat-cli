@@ -24,7 +24,7 @@ export default class Help extends Command
 
     async execute(args)
     {
-        const { inputArguments } = Command.parseProcessArgs(args)
+        const { inputArguments } = this.parseProcessArgs(args)
 
         if (inputArguments.length > 0) {
             await cli([process.execPath, filename(import.meta.url), inputArguments[0], '--help'])

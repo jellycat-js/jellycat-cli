@@ -22,6 +22,11 @@ const format = {
 	        const space = ' '.repeat((length+2) - format.ansiEscapeCodes(item[0]).length)
 	        return `${' '.repeat(indent)}${item[0]}${space}${item[1]}`
 	    }).join('\n') + '\n'
+	},
+	orList: arr => {
+		let list = arr.join(', ')
+		const lastIndex = list.lastIndexOf(', ')
+		return `${list.slice(0, lastIndex)} or ${list.slice(lastIndex+1)}`
 	}
 }
 
@@ -32,23 +37,9 @@ const env = {
 	pkg: (key = false) => {
 		const pkgObject = JSON.parse(fs.readFileSync(`${env.dirname(import.meta.url)}../../package.json`))
 		return key ? ( key in pkgObject ? pkgObject[key] : {}) : pkg
-	},
-	resolveCommands: path => {
-        const commands = { root: [] }
-
-        fs.readdirSync(env.dirname(path)).forEach(ls => {
-            !fs.lstatSync(`${env.dirname(path)}/${ls}`).isDirectory()
-                ? commands.root.push(ls.split('.')[0])
-                : fs.readdirSync(`${env.dirname(path)}/${ls}`).forEach(file => {
-                    if (!Object.keys(commands).includes(ls)) commands[ls] = []
-                    commands[ls].push(file.split('.')[0])
-                })
-        })
-
-        return commands
-    }
+	}
 }
 
 export const { error, primary, secondary } = color
-export const { ansiEscapeCodes, columnDisplay } = format
-export const { filename, dirname, cmdPath, pkg, resolveCommands } = env
+export const { ansiEscapeCodes, columnDisplay, orList } = format
+export const { filename, dirname, cmdPath, pkg } = env
