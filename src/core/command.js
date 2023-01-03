@@ -1,7 +1,8 @@
 'use strict'
 
 import readline from 'readline'
-import { primary, secondary, pkg, columnDisplay } from './utils.js'
+import cli from '../cli.js'
+import { applyColor, primary, secondary, pkg, columnDisplay, filename } from './utils.js'
 
 
 export default class Command
@@ -23,10 +24,17 @@ export default class Command
 
 		this.helpContent = helpContent
 
-		this.readline = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		})
+		this.readline = readline.createInterface({ input: process.stdin, output: process.stdout })
+	}
+
+	async _execute(args)
+	{
+		try { await this.execute(args) }
+		catch(e) {
+			throw this.verbose === 3 
+				? `${e}\n${e.stack.split('\n').slice(1).join('\n')}`
+				: e
+		}
 	}
 
 	parseProcessArgs(args)
@@ -63,17 +71,30 @@ export default class Command
 		})	
 	}
 
-	async checkAndAskInput([args, index], rule, question)
+	async checkAndAskInput([args, index], [rule, help])
 	{
+		if (args.length < this.args.length) {
+			this.help()
+			process.exit(1)
+		}
+
 		let input = typeof args[index] === 'undefined' ? '' : args[index]
 
-		while(!rule.test(input))
-		{
-			input = await this.askInput(question)
-			if (input.length === 0) process.exit(1)
+		if (rule != null) {
+			while(!rule.test(input))
+			{
+				if (this.verbose >= 2 && help !== null) console.error(`\n${help}`)
+				input = await this.askInput(`\n${this.args[index][1]}:\n> `)
+				if (input.length === 0) process.exit(1)
+			}
 		}
 
 		return input
+	}
+
+	async runCLi(command, args)
+	{
+		return await cli([process.execPath, filename(import.meta.url), command, ...args])
 	}
 
 	isJellycat()
@@ -108,8 +129,8 @@ export default class Command
 	    output.forEach(line => this.writeLn(`${line}\n`))
 	}
 
-	writeLn($line)
+	writeLn(line)
 	{
-		if (!this.quiet) process.stdout.write($line)
+		if (!this.quiet) process.stdout.write(applyColor(line))
 	}
 }

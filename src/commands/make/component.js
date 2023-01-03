@@ -42,11 +42,9 @@ export default class MakeComponent extends Command
             if (typeof inputArguments[0] === 'undefined') inputArguments[0] = 'App'
         }
 
-    	const name = await this.checkAndAskInput(
-    		[inputArguments, 0], 
-    		/^([A-Z]{1}[a-z]*){1,2}$/,
-    		`\n${primary('Choose a name for your component class (e.g. ')}${secondary('App')}${primary('):')}\n> `
-    	)
+    	const name = await this.checkAndAskInput([inputArguments, 0], [
+    		/^([A-Z]{1}[a-z]*){1,2}$/, `Argument ${this.args[0][0]} must be a valid UpperCamelCase string (2 words max)`
+    	])
 
     	const ancestor = this.defineAncestor(inputOptions.find(option => /^--tagname=|-t=/.test(option)))
     	const tag = this.defineTagByPrefix(name, inputOptions.find(option => /^--prefix=|-p=/.test(option)))

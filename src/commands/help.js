@@ -1,6 +1,5 @@
 'use strict'
 
-import cli from '../cli.js'
 import Command from '../core/command.js'
 import { primary, secondary, filename } from '../core/utils.js'
 
@@ -27,7 +26,7 @@ export default class Help extends Command
         const { inputArguments } = this.parseProcessArgs(args)
 
         if (inputArguments.length > 0) {
-            await cli([process.execPath, filename(import.meta.url), inputArguments[0], '--help'])
+            await this.runCLi(inputArguments[0], ['--help'])
             process.exit()
         }
 

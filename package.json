@@ -1,9 +1,15 @@
 {
   "name": "@jellycat-js/jellycat-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Jellycat framework CLI tool to create a web application, component or mixin",
-  "repository": "git://github.com/jellycat-js/jellycat-cli.git",
-  "bugs": "https://github.com/jellycat-js/jellycat-cli/issues",
+  "homepage": "https://github.com/jellycat-js/jellycat-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jellycat-js/jellycat-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jellycat-js/jellycat-cli/issues"
+  },
   "author": "Louis-Antoine Lumet (cxxi)",
   "license": "MIT",
   "main": "bin/make-jellycat",

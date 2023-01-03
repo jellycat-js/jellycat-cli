@@ -4,7 +4,7 @@ import Command from '../core/command.js'
 import { primary, secondary, columnDisplay, pkg } from '../core/utils.js'
 
 export const definition = {
-    description: 'Display information about the Jellycat CLI and environement',  
+    description: 'Display information about the Jellycat, CLI and environement',  
     usage: 'about', 
     args: [],
     options: [],

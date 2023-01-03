@@ -33,11 +33,9 @@ export default class MakeMixin extends Command
             if (typeof inputArguments[0] === 'undefined') inputArguments[0] = 'CoolStuff'
         }
 
-    	const name = await this.checkAndAskInput(
-    		[inputArguments, 0], 
-    		/^([A-Z]{1}[a-z]*)+$/,
-    		`\n${primary('Choose a name for your mixin class (e.g. ')}${secondary('CoolStuff')}${primary('):')}\n> `
-    	)
+    	const name = await this.checkAndAskInput([inputArguments, 0], [
+    		/^([A-Z]{1}[a-z]*)+$/, `Argument ${this.args[0][0]} must be a valid UpperCamelCase string`
+    	])
 
 		const buildedTemplate = template({name})
 

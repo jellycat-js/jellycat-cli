@@ -4,22 +4,24 @@ import * as url from 'url'
 import fs from 'fs'
 
 const color = {
-	error: str => `\x1b[31m${str}\x1b[0m`,
-	primary: str => `\x1b[36m\x1b[1m${str}\x1b[0m`,
-	secondary: str => `\x1b[34m${str}\x1b[0m`
+	error: str => `_RED_${str}_RESET_`,
+	primary: str => `_CYAN__BOLD_${str}_RESET_`,
+	secondary: str => `_BLUE_${str}_RESET_`,
+	applyColor: str => str
+		.replaceAll('_RED_', '\x1b[31m')
+		.replaceAll('_CYAN_', '\x1b[36m')
+		.replaceAll('_BLUE_', '\x1b[34m')
+		.replaceAll('_BOLD_', '\x1b[1m')
+		.replaceAll('_RESET_', '\x1b[0m')
 }
 
 const format = {
-	ansiEscapeCodes: str => str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''),
 	columnDisplay: (items, indent = 0) => {
 		const minLength = 20
-	    const maxLength = format.ansiEscapeCodes(items.reduce((a, b) => {
-	        return format.ansiEscapeCodes(a[0]).length > format.ansiEscapeCodes(b[0]).length ? a[0] : b[0] 
-	    })[0]).length
-	    
+		const maxLength = Math.max(...items.map(item => item[0].replaceAll(/_[A-Z]+_/g, '').length))
 	    return items.map(item => {
 	        const length = maxLength > minLength ? maxLength : minLength
-	        const space = ' '.repeat((length+2) - format.ansiEscapeCodes(item[0]).length)
+	        const space = ' '.repeat((length+2) - item[0].replaceAll(/_[A-Z]+_/g, '').length)
 	        return `${' '.repeat(indent)}${item[0]}${space}${item[1]}`
 	    }).join('\n') + '\n'
 	},
@@ -40,6 +42,6 @@ const env = {
 	}
 }
 
-export const { error, primary, secondary } = color
-export const { ansiEscapeCodes, columnDisplay, orList } = format
+export const { applyColor, error, primary, secondary } = color
+export const { columnDisplay, orList } = format
 export const { filename, dirname, cmdPath, pkg } = env
