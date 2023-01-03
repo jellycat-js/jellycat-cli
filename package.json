@@ -1,6 +1,6 @@
 {
   "name": "@jellycat-js/jellycat-cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Jellycat framework CLI tool to create a web application, component or mixin",
   "homepage": "https://github.com/jellycat-js/jellycat-cli#readme",
   "repository": {
