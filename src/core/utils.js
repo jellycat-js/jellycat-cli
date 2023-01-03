@@ -39,7 +39,7 @@ const env = {
 	cmdPath: name => {
 		let buildedPath = path.resolve(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`)
 		if (process.platform === "win32") {
-			buildedPath = url.pathToFileURL(p).href.replace(/\\/g, '/')
+			buildedPath = url.pathToFileURL(buildedPath).href.replace(/\\/g, '/')
 		}
 		return buildedPath
 	},
