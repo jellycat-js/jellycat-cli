@@ -67,13 +67,13 @@ export default class Command
 	async askInput(question)
 	{
 		return await new Promise(resolve => {
-			this.readline.question(question, resolve)
+			this.readline.question(applyColor(question), resolve)
 		})	
 	}
 
-	async checkAndAskInput([args, index], [rule, help])
+	async checkAndAskInput([args, index], [rule, help], interactive = false)
 	{
-		if (args.length < this.args.length) {
+		if (args.length < this.args.length && !interactive) {
 			this.help()
 			process.exit(1)
 		}

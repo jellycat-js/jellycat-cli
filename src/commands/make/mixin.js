@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import template from '../../templates/mixin.js'
-import { primary, secondary } from '../../core/utils.js'
+import { primary, secondary, win32support } from '../../core/utils.js'
 import Command from '../../core/command.js'
 
 export const definition = {
@@ -35,16 +35,16 @@ export default class MakeMixin extends Command
 
     	const name = await this.checkAndAskInput([inputArguments, 0], [
     		/^([A-Z]{1}[a-z]*)+$/, `Argument ${this.args[0][0]} must be a valid UpperCamelCase string`
-    	])
+    	], true)
 
 		const buildedTemplate = template({name})
 
-		if (this.isJellycat() && !fs.existsSync(`${process.env.PWD}/mixins`)) {
-			fs.mkdirSync(`${process.env.PWD}/mixins`)
+		if (this.isJellycat() && !fs.existsSync(win32support(`${process.env.PWD}/mixins`))) {
+			fs.mkdirSync(win32support(`${process.env.PWD}/mixins`))
 		}
 
-		if (!fs.existsSync(`${process.env.PWD}/${this.isJellycat() ? `mixins/${name}`: name}.js`)) {
-			fs.writeFileSync(`${process.env.PWD}/${this.isJellycat() ? `mixins/${name}`: name}.js`, buildedTemplate, { flag: 'wx' })
+		if (!fs.existsSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `mixins/${name}`: name}.js`))) {
+			fs.writeFileSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `mixins/${name}`: name}.js`), buildedTemplate, { flag: 'wx' })
 		}
 
 		process.exit()

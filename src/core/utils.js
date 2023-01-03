@@ -1,7 +1,7 @@
 'use strict'
 
 import * as url from 'url'
-import path from 'path'
+import { resolve } from 'path'
 import fs from 'fs'
 
 const color = {
@@ -34,21 +34,16 @@ const format = {
 }
 
 const env = {
+	win32support: path => process.platform === "win32" ? resolve(url.pathToFileURL(path).href.replace(/\\/g, '/')) : path,
 	filename: path => url.fileURLToPath(path),
 	dirname: path => url.fileURLToPath(new URL('.', path)),
-	cmdPath: name => {
-		let buildedPath = path.resolve(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`)
-		if (process.platform === "win32") {
-			buildedPath = url.pathToFileURL(buildedPath).href.replace(/\\/g, '/')
-		}
-		return buildedPath
-	},
+	cmdPath: name => env.win32support(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`),
 	pkg: (key = false) => {
-		const pkgObject = JSON.parse(fs.readFileSync(`${env.dirname(import.meta.url)}../../package.json`))
+		const pkgObject = JSON.parse(fs.readFileSync(env.win32support(`${env.dirname(import.meta.url)}../../package.json`)))
 		return key ? ( key in pkgObject ? pkgObject[key] : {}) : pkg
 	}
 }
 
 export const { applyColor, error, primary, secondary } = color
 export const { columnDisplay, orList } = format
-export const { filename, dirname, cmdPath, pkg } = env
+export const { filename, dirname, cmdPath, pkg, win32support } = env

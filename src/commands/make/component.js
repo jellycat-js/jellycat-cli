@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import * as template from '../../templates/component.js'
-import { primary, secondary, orList } from '../../core/utils.js'
+import { primary, secondary, orList, win32support } from '../../core/utils.js'
 import Command from '../../core/command.js'
 
 const availableTagnames = ['div', 'span', 'ul', 'li', 'p', 'label', 'input', 'textarea']
@@ -44,7 +44,7 @@ export default class MakeComponent extends Command
 
     	const name = await this.checkAndAskInput([inputArguments, 0], [
     		/^([A-Z]{1}[a-z]*){1,2}$/, `Argument ${this.args[0][0]} must be a valid UpperCamelCase string (2 words max)`
-    	])
+    	], true)
 
     	const ancestor = this.defineAncestor(inputOptions.find(option => /^--tagname=|-t=/.test(option)))
     	const tag = this.defineTagByPrefix(name, inputOptions.find(option => /^--prefix=|-p=/.test(option)))
@@ -60,16 +60,16 @@ export default class MakeComponent extends Command
 
 			const buildedTemplate = code({ name, tag, ancestor, mixinReady: inputOptions.includes('--with-mixin') })
 
-			if (this.isJellycat() && !fs.existsSync(`${process.env.PWD}/components`)) {
-				fs.mkdirSync(`${process.env.PWD}/components`)
+			if (this.isJellycat() && !fs.existsSync(win32support(`${process.env.PWD}/components`))) {
+				fs.mkdirSync(win32support(`${process.env.PWD}/components`))
 			}
 
-			if (!fs.existsSync(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}`)) {
-				fs.mkdirSync(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}`)
+			if (!fs.existsSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}`))) {
+				fs.mkdirSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}`))
 			}
 
-			if (!fs.existsSync(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}/${name}.${ext}`)) {
-				fs.writeFileSync(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}/${name}.${ext}`, buildedTemplate, { flag: 'wx' })
+			if (!fs.existsSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}/${name}.${ext}`))) {
+				fs.writeFileSync(win32support(`${process.env.PWD}/${this.isJellycat() ? `components/${name}`: name}/${name}.${ext}`), buildedTemplate, { flag: 'wx' })
 			}
 		}
 

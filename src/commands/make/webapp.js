@@ -3,7 +3,7 @@
 import fs from 'fs'
 import { exec, execSync } from 'child_process'
 import Command from '../../core/command.js'
-import { primary, secondary } from '../../core/utils.js'
+import { primary, secondary, win32support } from '../../core/utils.js'
 
 export const definition = {
     description: 'Creates a base webapp',  
@@ -31,10 +31,10 @@ export default class MakeWebapp extends Command
         }
 
         const name = await this.checkAndAskInput([inputArguments, 0], [null, null])
-        const projectDir = `${process.env.PWD}/${name}`
+        const projectDir = win32support(`${process.env.PWD}/${name}`)
 
         if (fs.existsSync(projectDir)) {
-            throw new Error(`Directory with name ${name} already exists in ${process.env.PWD}`)
+            throw new Error(`Directory with name ${name} already exists in ${win32support(process.env.PWD)}`)
         }
 
         // fs.mkdirSync(projectDir)
