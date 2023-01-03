@@ -1,6 +1,7 @@
 'use strict'
 
 import * as url from 'url'
+import path from 'path'
 import fs from 'fs'
 
 const color = {
@@ -35,7 +36,13 @@ const format = {
 const env = {
 	filename: path => url.fileURLToPath(path),
 	dirname: path => url.fileURLToPath(new URL('.', path)),
-	cmdPath: name => `${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`,
+	cmdPath: name => {
+		let buildedPath = path.resolve(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`)
+		if (process.platform === "win32") {
+			buildedPath = url.pathToFileURL(p).href.replace(/\\/g, '/')
+		}
+		return buildedPath
+	},
 	pkg: (key = false) => {
 		const pkgObject = JSON.parse(fs.readFileSync(`${env.dirname(import.meta.url)}../../package.json`))
 		return key ? ( key in pkgObject ? pkgObject[key] : {}) : pkg
