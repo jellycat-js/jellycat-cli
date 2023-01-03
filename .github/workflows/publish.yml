@@ -23,7 +23,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
     permissions: 
       contents: read
       packages: write
@@ -45,13 +45,6 @@ jobs:
           node-version: 16
           registry-url: https://npm.pkg.github.com
           scope: '@jellycat-js'
-
-      - name: Download build artifact
-        if: steps.check.outputs.changed == 'true'
-        uses: actions/download-artifact@v3
-        with:
-          name: rollup artifacts
-          path: dist
 
       - name: Publish package to Github Package Registry
         if: steps.check.outputs.changed == 'true'
