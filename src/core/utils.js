@@ -39,7 +39,7 @@ const env = {
 	dirname: path => url.fileURLToPath(new URL('.', path)),
 	cmdPath: name => env.win32support(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`),
 	pkg: (key = false) => {
-		const pkgObject = JSON.parse(fs.readFileSync(env.win32support(`${env.dirname(import.meta.url)}../../package.json`)))
+		const pkgObject = JSON.parse(fs.readFileSync(`${env.dirname(import.meta.url)}../../package.json`))
 		return key ? ( key in pkgObject ? pkgObject[key] : {}) : pkg
 	}
 }
