@@ -90,10 +90,10 @@ export default class List extends Command
     {
         const commands = { root: [] }
 
-        fs.readdirSync(win32support(dirname(path))).forEach(ls => {
-            !fs.lstatSync(win32support(`${dirname(path)}/${ls}`)).isDirectory()
+        fs.readdirSync(dirname(path)).forEach(ls => {
+            !fs.lstatSync(`${dirname(path)}/${ls}`).isDirectory()
                 ? commands.root.push(ls.split('.')[0])
-                : fs.readdirSync(win32support(`${dirname(path)}/${ls}`)).forEach(file => {
+                : fs.readdirSync(`${dirname(path)}/${ls}`).forEach(file => {
                     if (!Object.keys(commands).includes(ls)) commands[ls] = []
                     commands[ls].push(file.split('.')[0])
                 })
