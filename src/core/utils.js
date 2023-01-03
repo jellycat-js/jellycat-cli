@@ -39,8 +39,8 @@ const env = {
 	dirname: path => url.fileURLToPath(new URL('.', path)),
 	cmdPath: name => env.win32support(`${env.dirname(import.meta.url)}../commands/${name.replace(':', '/')}.js`),
 	pkg: (key = false) => {
-		let path = env.win32support(`${env.dirname(import.meta.url)}../../package.json`)
-		console.log(`DEBUG: ${path}`)
+		let path = `${env.dirname(import.meta.url)}../../package.json`
+		console.log(process.platform, `DEBUG: ${path}`)
 		let packageJson = fs.readFileSync(path)
 		console.log(`DEBUG: ${packageJson}`)
 		const pkgObject = JSON.parse(packageJson)
